@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tipp-Trainer – 10-Finger-Schreiben</title>
+<meta name="description" content="Offline 10-Finger-Schreibtrainer auf Deutsch, für iPad, iPhone und Computer">
+<meta name="theme-color" content="#0f7a6e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tipp-Trainer">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f4f0e8; --bg2:#e7f3ef; --card:#fff; --text:#17202a; --muted:#5b6b76;
+  --line:#e4ddd2; --accent:#0f7a6e; --accent2:#d9a21b; --ok:#1a8a58; --bad:#c94b3a;
+  --next:#1d6fd1; --chip:#eef4f2; --shadow:0 8px 28px rgba(23,32,42,.08);
+  --finger-LP:#f2c94c; --finger-LR:#f2994a; --finger-LM:#eb5757; --finger-LI:#27ae60;
+  --finger-RI:#2d9cdb; --finger-RM:#9b51e0; --finger-RR:#bb6bd9; --finger-RP:#56ccf2;
+  --finger-LT:#b0bec5; --finger-RT:#b0bec5;
+  --radius:20px;
+}
+[data-theme="dark"]{
+  --bg:#12181f; --bg2:#1a2430; --card:#1c2530; --text:#eef3f7; --muted:#9aa8b4;
+  --line:#2a3542; --accent:#3ecfb8; --accent2:#f0c14b; --ok:#3dce86; --bad:#f07167;
+  --next:#6db1ff; --chip:#243140; --shadow:0 8px 28px rgba(0,0,0,.35);
+}
+[data-cb="1"]{
+  --ok:#0072b2; --bad:#e69f00; --next:#56b4e9; --accent:#009e73; --accent2:#f0e442;
+  --finger-LP:#e69f00; --finger-LR:#56b4e9; --finger-LM:#009e73; --finger-LI:#f0e442;
+  --finger-RI:#0072b2; --finger-RM:#d55e00; --finger-RR:#cc79a7; --finger-RP:#000000;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
+body{
+  font-family:ui-rounded,"SF Pro Rounded","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--text); background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%) fixed;
+  min-height:100vh; font-size:18px; line-height:1.45;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+body.large{font-size:20px}
+[data-motion="reduce"] *{animation:none!important;transition:none!important}
+.wrap{width:100%;max-width:1080px;margin:0 auto;padding:12px 16px 40px}
+.screen{display:none}.screen.on{display:block}
+h1{font-size:28px;margin:4px 0 6px;letter-spacing:-.02em}
+h2{font-size:20px;margin:0 0 10px}
+.sub{color:var(--muted);margin:0 0 14px}
+.card{background:var(--card);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);margin:12px 0;border:1px solid var(--line)}
+.btn{display:block;width:100%;min-height:52px;border:none;border-radius:16px;font:inherit;font-weight:750;font-size:18px;color:#fff;background:var(--accent);
+  margin:8px 0;padding:12px 16px;cursor:pointer;touch-action:manipulation;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.12)}
+.btn.gold{background:var(--accent2);color:#1c1608}
+.btn.ghost{background:transparent;color:var(--text);border:2px solid var(--line);box-shadow:none}
+.btn.warn{background:var(--bad)}
+.btn.klein{min-height:46px;font-size:16px;width:auto;display:inline-block;padding:8px 14px;margin:4px}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row .btn{flex:1;min-width:140px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tile{border:2px solid var(--line);background:var(--card);border-radius:18px;padding:14px 12px;min-height:88px;font:inherit;font-weight:750;text-align:left;cursor:pointer;color:var(--text);touch-action:manipulation}
+.tile:active{transform:scale(.98)}
+.tile b{display:block;font-size:18px}
+.tile small{display:block;color:var(--muted);font-weight:600;margin-top:4px}
+.tile.hero{display:block;width:100%;background:linear-gradient(135deg,var(--accent),#14998a);color:#fff;border:none;min-height:100px}
+.tile.hero small{color:rgba(255,255,255,.85)}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:4px 0 10px}
+.pill{border:none;background:var(--chip);color:var(--text);border-radius:999px;min-height:44px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.statrow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:8px 0}
+.stat{background:var(--chip);border-radius:14px;padding:8px 4px;text-align:center}
+.stat b{display:block;font-size:18px;color:var(--accent)}
+.stat span{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.prompt{
+  font-size:clamp(20px,3.4vw,28px);line-height:1.6;font-weight:650;letter-spacing:.01em;
+  background:var(--chip);border-radius:16px;padding:16px;min-height:92px;cursor:text;overflow-wrap:anywhere;
+}
+body.large .prompt{font-size:clamp(22px,3.8vw,32px)}
+.prompt .ok{color:var(--ok)}
+.prompt .bad{color:var(--bad);text-decoration:underline}
+.prompt .caret{background:var(--next);color:#fff;border-radius:6px;padding:0 3px;box-shadow:0 0 0 3px rgba(29,111,209,.18)}
+.prompt .rest{color:var(--text)}
+.kbd{margin-top:12px;user-select:none}
+.kbd-row{display:flex;justify-content:center;gap:3px;margin:3px 0}
+.k{--w:1;flex:var(--w);min-width:0;min-height:36px;border-radius:8px;background:var(--card);border:2px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;position:relative}
+.k.on{border-color:var(--next);background:var(--next);color:#fff;transform:translateY(-2px)}
+.k.shift-on{border-color:var(--accent2)}
+.k .dot{position:absolute;bottom:3px;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.35}
+.spacebar{flex:6}
+.finger{text-align:center;font-weight:750;color:var(--muted);min-height:28px;margin:6px 0}
+.lives{display:flex;gap:8px;align-items:center}
+.stars{font-size:42px;letter-spacing:4px;text-align:center;margin:6px 0}
+.bar-wrap{display:flex;gap:4px;align-items:flex-end;height:88px;margin:8px 0}
+.bar-wrap i{flex:1;background:var(--accent);border-radius:8px 8px 4px 4px;min-height:4px;opacity:.9}
+.lesson{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:12px;min-height:64px;font:inherit;cursor:pointer;color:var(--text)}
+.lesson:disabled{opacity:.5;cursor:default}
+.lesson .nr{width:36px;height:36px;border-radius:10px;background:var(--chip);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+.lesson .meta{flex:1;min-width:0}
+.lesson .meta b{display:block}
+.lesson .meta small{color:var(--muted)}
+.lock{font-size:18px}
+#ghost{position:fixed;left:0;bottom:0;width:100%;height:44px;opacity:.01;font-size:18px;border:0;margin:0;padding:0;background:transparent;z-index:2;caret-color:transparent}
+#err{display:none;position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top) + 8px);z-index:80;background:#fff3d6;color:#1c1608;border:2px solid var(--accent2);border-radius:14px;padding:10px 12px;font-size:16px}
+[data-theme="dark"] #err{background:#3d3418;color:#fff3d6}
+#update{display:none;position:fixed;left:8px;right:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:80;background:#12352f;color:#fff;border-radius:16px;padding:12px 14px;font-weight:700;box-shadow:var(--shadow)}
+#update button{margin-top:8px;background:#fff;color:#12352f;border:none;border-radius:12px;min-height:44px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+#dlg{position:fixed;inset:0;background:rgba(16,22,30,.55);z-index:70;display:none;align-items:center;justify-content:center;padding:20px}
+#dlg.on{display:flex}#dlg .box{background:var(--card);color:var(--text);border-radius:22px;padding:22px;max-width:440px;width:100%;text-align:center;font-weight:700}
+.switch{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-weight:700}
+.switch input{width:22px;height:22px}
+select,input[type=text],input[type=number],textarea{font:inherit;border:2px solid var(--line);border-radius:12px;padding:10px 12px;min-height:46px;width:100%;background:var(--card);color:var(--text)}
+label.lab{display:block;font-size:14px;font-weight:800;color:var(--muted);margin:10px 0 6px}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--chip);border-radius:999px;padding:6px 10px;margin:4px 4px 4px 0;font-size:14px;font-weight:750}
+.badge.off{opacity:.4}
+.heat .k{border-width:2px}
+.hint{background:var(--chip);border-radius:14px;padding:10px 12px;color:var(--muted);font-size:15px}
+.cmp{font-weight:750;text-align:center;margin:8px 0}
+#certc{width:100%;max-width:640px;border-radius:16px;background:#fff}
+@media (min-width:700px){
+  h1{font-size:34px}.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .k{min-height:48px;font-size:16px}
+}
+@media (min-width:1100px){ .wrap{max-width:1120px} }
+@media (orientation:landscape) and (max-height:500px){
+  .prompt{min-height:64px;padding:10px;font-size:20px}
+  .k{min-height:28px}
+  h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div id="err" role="status"></div>
+<div id="update"><div>Neue Version verfügbar.</div><button type="button" id="b-upd">Jetzt aktualisieren</button></div>
+<div id="dlg" role="dialog" aria-modal="true"><div class="box"><p id="dlg-t"></p><div id="dlg-a"></div></div></div>
+<input id="ghost" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="text" aria-label="Texteingabe">
+
+<div class="wrap">
+<section id="s-onboard" class="screen">
+  <h1>👋 Willkommen beim Tipp-Trainer</h1>
+  <p class="sub">10-Finger-Schreiben üben – offline, auf Deutsch, für Corinna und Adam.</p>
+  <div class="card">
+    <p>Wer tippt?</p>
+    <div class="grid2">
+      <button type="button" class="tile" data-quick="Adam"><b>Adam</b><small>Vater</small></button>
+      <button type="button" class="tile" data-quick="Corinna"><b>Corinna</b><small>6. Klasse</small></button>
+    </div>
+    <label class="lab">Oder eigener Name</label>
+    <input id="on-name" type="text" maxlength="24" placeholder="Name">
+    <button type="button" class="btn" id="b-on-go">Los geht’s</button>
+  </div>
+</section>
+
+<section id="s-home" class="screen">
+  <div class="topbar">
+    <div>
+      <h1 id="hi">Hallo!</h1>
+      <p class="sub" id="home-sub"></p>
+    </div>
+    <button type="button" class="pill" id="b-profile">Profil</button>
+  </div>
+  <div class="card" id="daily-card"></div>
+  <button type="button" class="tile hero" id="b-today"><b>✨ Heute für dich</b><small>Übung aus deinen schwierigen Tasten und Tastenfolgen</small></button>
+  <div class="grid3" id="home-modes"></div>
+  <div class="card">
+    <h2>Diese Woche</h2>
+    <div class="bar-wrap" id="week-bars"></div>
+    <div id="badge-row"></div>
+  </div>
+  <p class="hint">Auf iPhone und iPad ist eine Bluetooth-Tastatur am angenehmsten. Ohne Hardware-Tastatur öffnet ein Tipp auf den Übungstext die Bildschirmtastatur.</p>
+</section>
+
+<section id="s-lessons" class="screen">
+  <div class="topbar"><button type="button" class="pill" id="b-back-l">← Zurück</button><h2>Lektionen</h2><span></span></div>
+  <div id="lesson-list"></div>
+</section>
+
+<section id="s-texts" class="screen">
+  <div class="topbar"><button type="button" class="pill" id="b-back-t">← Zurück</button><h2>Texte</h2><span></span></div>
+  <div class="card">
+    <label class="lab">Eigenen Text einfügen</label>
+    <textarea id="own-text" rows="4" placeholder="Hier eigenen Text einfügen …"></textarea>
+    <button type="button" class="btn" id="b-own">Diesen Text üben</button>
+  </div>
+  <div id="text-cats"></div>
+</section>
+
+<section id="s-practice" class="screen">
+  <div class="topbar">
+    <button type="button" class="pill" id="b-pause">⏸ Pause</button>
+    <b id="p-title">Übung</b>
+    <button type="button" class="pill" id="b-abort">Abbrechen</button>
+  </div>
+  <div class="statrow">
+    <div class="stat"><b id="lv-cpm">0</b><span>A/min</span></div>
+    <div class="stat"><b id="lv-wpm">0</b><span>W/min</span></div>
+    <div class="stat"><b id="lv-acc">100 %</b><span>Genau</span></div>
+    <div class="stat"><b id="lv-err">0</b><span>Fehler</span></div>
+    <div class="stat"><b id="lv-t">0:00</b><span>Zeit</span></div>
+  </div>
+  <div class="prompt" id="prompt" tabindex="0"></div>
+  <div class="finger" id="finger-hint"></div>
+  <div class="kbd" id="kbd"></div>
+  <div class="row">
+    <button type="button" class="btn ghost klein" id="b-restart">↻ Neu starten</button>
+  </div>
+</section>
+
+<section id="s-result" class="screen">
+  <h1 id="r-h">Geschafft!</h1>
+  <div class="stars" id="r-stars"></div>
+  <p class="sub center" id="r-praise" style="text-align:center"></p>
+  <div class="card">
+    <div class="statrow">
+      <div class="stat"><b id="r-cpm"></b><span>A/min</span></div>
+      <div class="stat"><b id="r-wpm"></b><span>W/min</span></div>
+      <div class="stat"><b id="r-acc"></b><span>Genau</span></div>
+      <div class="stat"><b id="r-err"></b><span>Fehler</span></div>
+      <div class="stat"><b id="r-t"></b><span>Zeit</span></div>
+    </div>
+    <p class="cmp" id="r-cmp"></p>
+    <div id="r-newbadge"></div>
+  </div>
+  <button type="button" class="btn gold" id="b-cert">Abschluss-Urkunde</button>
+  <button type="button" class="btn" id="b-again">Noch einmal</button>
+  <button type="button" class="btn ghost" id="b-res-home">Zur Übersicht</button>
+</section>
+
+<section id="s-stats" class="screen">
+  <div class="topbar"><button type="button" class="pill" id="b-back-s">← Zurück</button><h2>Statistik</h2><span></span></div>
+  <div class="card">
+    <h2>Verlauf</h2>
+    <svg id="chart" viewBox="0 0 320 140" width="100%" height="160" aria-label="Verlaufsdiagramm"></svg>
+    <p class="hint" id="chart-leg">Teal: Anschläge/min · Gold: Wörter/min · Blau: Genauigkeit %</p>
+  </div>
+  <div class="card">
+    <h2>Tastatur-Heatmap</h2>
+    <p class="hint">Je röter / kräftiger, desto mehr Fehler. Tippe eine Taste für Details.</p>
+    <div class="kbd heat" id="heat"></div>
+    <p id="heat-info" class="sub"></p>
+  </div>
+  <div class="card">
+    <h2>Problemtasten</h2>
+    <div id="prob-keys"></div>
+  </div>
+  <div class="row">
+    <button type="button" class="btn klein" id="b-export">Fortschritt exportieren</button>
+    <button type="button" class="btn ghost klein" id="b-import">Importieren</button>
+  </div>
+  <input type="file" id="import-file" accept="application/json,.json" hidden>
+</section>
+
+<section id="s-settings" class="screen">
+  <div class="topbar"><button type="button" class="pill" id="b-back-e">← Zurück</button><h2>Einstellungen</h2><span></span></div>
+  <div class="card" id="set-list"></div>
+  <div class="card">
+    <h2>Profil</h2>
+    <label class="lab">Anzeigename</label>
+    <input id="set-name" type="text" maxlength="24">
+    <button type="button" class="btn klein" id="b-ren">Namen speichern</button>
+    <button type="button" class="btn ghost klein" id="b-newprof">Weiteres Profil anlegen</button>
+    <button type="button" class="btn warn klein" id="b-wipe">Daten löschen…</button>
+  </div>
+</section>
+
+<section id="s-cert" class="screen">
+  <div class="topbar"><button type="button" class="pill" id="b-back-c">← Zurück</button><h2>Urkunde</h2><span></span></div>
+  <div class="card" style="text-align:center">
+    <canvas id="certc" width="1200" height="800"></canvas>
+    <button type="button" class="btn" id="b-dl-cert">Bild speichern</button>
+  </div>
+</section>
+
+<section id="s-game" class="screen">
+  <div class="topbar"><button type="button" class="pill" id="b-game-quit">← Zurück</button><h2>Wortregen</h2><span id="g-score">0</span></div>
+  <p class="hint">Tippe das Wort und drücke die Leertaste, bevor es unten ankommt.</p>
+  <div id="g-stage" style="position:relative;height:min(62vh,520px);border:2px solid var(--line);border-radius:16px;overflow:hidden;background:var(--chip)"></div>
+  <input id="g-in" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Wort tippen…" style="margin-top:10px;font-size:18px">
+</section>
+</div>
+
+<script src="src/logic.js"></script>
+<script src="src/lessons.js"></script>
+<script>
+(function(){
+"use strict";
+var T = window.Tipp, D = window.TippData;
+var KEY = "tipp_trainer_v1";
+var store, profile, pid;
+var S = { lastOpts: null, session: null, tick: null, metro: null, audio: null, game: null, lastRes: null, lastNewBadges: [] };
+function $(id){ return document.getElementById(id); }
+function show(id){
+  var a=document.querySelectorAll(".screen");
+  for(var i=0;i<a.length;i++) a[i].classList.remove("on");
+  $(id).classList.add("on");
+  window.scrollTo(0,0);
+  var g=$("ghost");
+  if(id!=="s-practice"){
+    try{ g.blur(); }catch(e){}
+    g.style.left="-9999px"; g.style.pointerEvents="none";
+  } else {
+    g.style.left="0"; g.style.pointerEvents="auto";
+  }
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];}); }
+function loadStore(){
+  try{
+    var raw=localStorage.getItem(KEY);
+    if(!raw) return { current:null, profiles:{} };
+    var o=JSON.parse(raw);
+    if(!o||typeof o!=="object") return { current:null, profiles:{} };
+    o.profiles=o.profiles||{};
+    return o;
+  }catch(e){ return { current:null, profiles:{} }; }
+}
+function saveStore(){
+  try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){}
+}
+function useProfile(id){
+  pid=id; profile=store.profiles[id]; store.current=id; saveStore();
+  applyAppearance();
+}
+function applyAppearance(){
+  var st=(profile&&profile.settings)||T.DEFAULT_SETTINGS;
+  var theme=st.theme||"auto";
+  var dark = theme==="dark" || (theme==="auto" && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+  document.documentElement.setAttribute("data-theme", dark?"dark":"light");
+  document.documentElement.setAttribute("data-cb", st.colorblind?"1":"0");
+  document.documentElement.setAttribute("data-motion", st.reduceMotion?"reduce":"ok");
+  document.body.classList.toggle("large", !!(st.largeType || (st.fontSize||22)>=26));
+}
+if(window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyAppearance);
+
+function dialog(text, actions){
+  $("dlg-t").textContent=text;
+  var box=$("dlg-a"); box.innerHTML="";
+  (actions||[{label:"OK"}]).forEach(function(a){
+    var b=document.createElement("button");
+    b.type="button"; b.className="btn"+(a.kind?" "+a.kind:"");
+    b.textContent=a.label;
+    b.onclick=function(){ $("dlg").classList.remove("on"); if(a.fn) a.fn(); };
+    box.appendChild(b);
+  });
+  $("dlg").classList.add("on");
+}
+
+function boot(){
+  store=loadStore();
+  if(!store.current || !store.profiles[store.current]){
+    show("s-onboard"); return;
+  }
+  useProfile(store.current);
+  renderHome(); show("s-home");
+}
+
+function createAndUse(name, extras){
+  name=(name||"").trim();
+  if(!name) return;
+  var id=T.slugName(name);
+  var n=id, i=2;
+  while(store.profiles[n]) n=id+"-"+i++;
+  store.profiles[n]=T.newProfile(name, extras||{});
+  useProfile(n);
+  renderHome(); show("s-home");
+}
+document.querySelectorAll("[data-quick]").forEach(function(btn){
+  btn.onclick=function(){ createAndUse(btn.getAttribute("data-quick"), { settings:{ level: btn.getAttribute("data-quick")==="Corinna"?"kind":"erwachsen" } }); };
+});
+$("b-on-go").onclick=function(){ createAndUse($("on-name").value); };
+
+function homeModes(){
+  return [
+    { id:"lessons", title:"Lektionen", sub:"34 Lektionen in 5 Stufen", go:renderLessons },
+    { id:"weak", title:"Schwache Tasten", sub:"Aus deinen Fehlern", go:function(){ startPractice({ mode:"weak", title:"Schwache Tasten", eventKind:"weak", text:T.generateWeakKeyText(profile.stats, 160) }); } },
+    { id:"texts", title:"Texte", sub:"Alltag, Schule, English …", go:renderTexts },
+    { id:"timed", title:"Zeittest", sub:"1, 3 oder 5 Minuten", go:pickTimed },
+    { id:"game", title:"Wortregen", sub:"Kleines Tipp-Spiel", go:startGame },
+    { id:"stats", title:"Statistik", sub:"Verlauf, Heatmap, Export", go:renderStats },
+    { id:"set", title:"Einstellungen", sub:"Tastatur, Ton, Thema …", go:renderSettings }
+  ];
+}
+
+function renderHome(){
+  applyAppearance();
+  $("hi").textContent="Hallo, "+profile.name+"!";
+  var st=profile.streak||{count:0};
+  var day=T.todayKey();
+  if(!profile.daily || profile.daily.day!==day) profile.daily={ day:day, minutes:0, goalMin:(profile.settings&&profile.settings.dailyGoalMin)||10 };
+  var d=profile.daily;
+  var left=Math.max(0, (d.goalMin||10)- (d.minutes||0));
+  $("home-sub").textContent=(st.count?("Serie: "+st.count+" Tag"+(st.count===1?"":"e")+" 🔥 · "):"")+(left<=0?"Tagesziel erreicht!":("Noch "+Math.ceil(left)+" Min. bis zum Tagesziel"));
+  var remind="";
+  if((d.minutes||0)===0) remind="<p class='hint'>Heute noch nicht geübt – schon fünf ruhige Minuten helfen.</p>";
+  else if(left>0) remind="<p class='hint'>Schön, dass du da bist! Fehlen noch "+Math.ceil(left)+" Minuten zum Tagesziel.</p>";
+  else remind="<p class='hint'>Tagesziel geschafft – stark, "+esc(profile.name)+"!</p>";
+  $("daily-card").innerHTML="<b>Tagesziel: "+Math.round(d.minutes||0)+" / "+(d.goalMin||10)+" Min.</b><div class='bar-wrap' style='height:14px'><i style='flex:"+(d.minutes||0)+";background:var(--accent)'></i><i style='flex:"+Math.max(0.2,left)+";background:var(--line)'></i></div>"+remind;
+  var h="";
+  homeModes().forEach(function(m){ h+="<button type='button' class='tile' data-m='"+m.id+"'><b>"+esc(m.title)+"</b><small>"+esc(m.sub)+"</small></button>"; });
+  $("home-modes").innerHTML=h;
+  $("home-modes").onclick=function(e){ var b=e.target.closest(".tile"); if(!b)return; var id=b.getAttribute("data-m"); var m=homeModes().filter(function(x){return x.id===id;})[0]; if(m) m.go(); };
+  $("b-today").onclick=function(){
+    startPractice({ mode:"adaptive", title:"Heute für dich", eventKind:"adaptive", text:T.generateAdaptiveText(profile.stats, 180) });
+  };
+  var week=T.weekBars(profile.history);
+  $("week-bars").innerHTML=week.map(function(b){ var hgt=Math.max(4, Math.min(88, (b.minutes||0)*12)); return "<i title='"+b.day+"' style='height:"+hgt+"px'></i>"; }).join("");
+  var br="";
+  T.BADGES.forEach(function(b){ var on=profile.badges&&profile.badges[b.id]; br+="<span class='badge"+(on?"":" off")+"' title='"+esc(b.desc)+"'>"+(on?"🏆":"○")+" "+esc(b.title)+"</span>"; });
+  $("badge-row").innerHTML=br;
+}
+$("b-profile").onclick=function(){
+  var names=Object.keys(store.profiles);
+  dialog("Profil wählen", names.map(function(id){ return { label:store.profiles[id].name+(id===pid?" (aktiv)":""), fn:function(){ useProfile(id); renderHome(); show("s-home"); } }; }).concat([{label:"Abbrechen",kind:"ghost"}]));
+};
+
+function renderLessons(){
+  var h="", lastG="";
+  D.LESSONS.forEach(function(L,i){
+    var g=D.LEVEL_NAMES[L.level]||"";
+    if(g!==lastG){ h+="<h2 style='margin:16px 0 8px'>"+esc(g)+"</h2>"; lastG=g; }
+    var open=T.isLessonUnlocked(D.LESSONS,i,profile.progress,profile.settings);
+    var p=(profile.progress||{})[L.id];
+    var stars=p&&p.best?p.best.stars:0;
+    var acc=p&&p.best?Math.round(p.best.acc)+"%":"";
+    var kind=D.KIND_NAMES[L.kind]||"";
+    h+="<button type='button' class='lesson' data-i='"+i+"' "+(open?"":"disabled")+"><span class='nr'>"+(i+1)+"</span><span class='meta'><b>"+esc(L.title)+"</b><small>"+esc(kind)+(acc?" · Beste Genauigkeit "+acc:"")+"</small></span><span>"+(open?("★★★".slice(0,stars)+"☆☆☆".slice(stars)):"🔒")+"</span></button>";
+  });
+  $("lesson-list").innerHTML=h;
+  $("lesson-list").onclick=function(e){
+    var b=e.target.closest(".lesson"); if(!b||b.disabled)return;
+    var L=D.LESSONS[+b.getAttribute("data-i")];
+    startPractice({ mode:"lesson", title:L.title, lesson:L, eventKind:L.exam?"exam":(L.id==="l01"?"lesson1":"practice"), text:L.text });
+  };
+  show("s-lessons");
+}
+$("b-back-l").onclick=function(){ renderHome(); show("s-home"); };
+
+function renderTexts(){
+  var h="";
+  Object.keys(D.TEXTS).forEach(function(k){
+    var c=D.TEXTS[k];
+    h+="<div class='card'><h2>"+esc(c.title)+"</h2>";
+    c.items.forEach(function(tx,i){
+      h+="<button type='button' class='lesson' data-c='"+k+"' data-i='"+i+"'><span class='meta'><b>Text "+(i+1)+"</b><small>"+esc(tx.slice(0,80))+"…</small></span></button>";
+    });
+    h+="</div>";
+  });
+  $("text-cats").innerHTML=h;
+  $("text-cats").onclick=function(e){
+    var b=e.target.closest(".lesson"); if(!b)return;
+    var c=D.TEXTS[b.getAttribute("data-c")];
+    var tx=c.items[+b.getAttribute("data-i")];
+    startPractice({ mode:"text", title:c.title, text:tx });
+  };
+  show("s-texts");
+}
+$("b-back-t").onclick=function(){ renderHome(); show("s-home"); };
+$("b-own").onclick=function(){
+  var t=($("own-text").value||"").trim();
+  if(!t){ dialog("Bitte zuerst einen Text einfügen.",[{label:"OK"}]); return; }
+  startPractice({ mode:"text", title:"Eigener Text", text:t });
+};
+
+function pickTimed(){
+  dialog("Wie lange soll der Zeittest dauern?",[
+    {label:"1 Minute", fn:function(){ startTimed(1); }},
+    {label:"3 Minuten", fn:function(){ startTimed(3); }},
+    {label:"5 Minuten", fn:function(){ startTimed(5); }},
+    {label:"Abbrechen", kind:"ghost"}
+  ]);
+}
+function longText(){
+  var parts=[];
+  Object.keys(D.TEXTS).forEach(function(k){ if(k!=="code") parts=parts.concat(D.TEXTS[k].items); });
+  D.LESSONS.filter(function(l){return l.kind==="text"||l.kind==="saetze";}).forEach(function(l){ parts.push(l.text); });
+  return parts.concat(parts).join(" ");
+}
+function startTimed(min){
+  startPractice({ mode:"timed", title:"Zeittest "+min+" Min.", minutes:min, text:longText() });
+}
+
+function startPractice(opts){
+  S.lastOpts=opts;
+  var st=profile.settings||T.DEFAULT_SETTINGS;
+  S.session=T.createSession(opts.text,{ mustCorrect:st.mustCorrect });
+  S.timerLimit=opts.minutes?opts.minutes*60000:0;
+  $("p-title").textContent=opts.title||"Übung";
+  renderKbd(true);
+  renderPrompt();
+  updateLive();
+  $("kbd").style.display=(st.keyboardHelp && !st.blind)?"block":"none";
+  $("finger-hint").style.display=st.showFingers?"block":"none";
+  show("s-practice");
+  focusGhost();
+  startTick();
+  if(st.metronome) startMetro(st.metronomeBpm||60); else stopMetro();
+}
+function focusGhost(){
+  var g=$("ghost");
+  try{ g.value=""; g.focus({preventScroll:true}); }catch(e){ try{g.focus();}catch(e2){} }
+}
+$("prompt").onclick=function(){ focusGhost(); };
+
+function renderPrompt(){
+  var s=S.session; if(!s) return;
+  var html="", i, ch;
+  for(i=0;i<s.chars.length;i++){
+    ch=esc(s.chars[i]);
+    if(s.marks[i]==="ok") html+="<span class='ok'>"+ch+"</span>";
+    else if(i===s.pos) html+="<span class='"+(s.awaitingBackspace?"bad":"caret")+"'>"+ch+"</span>";
+    else html+="<span class='rest'>"+ch+"</span>";
+  }
+  $("prompt").innerHTML=html||"&nbsp;";
+  var cur=s.pos<s.chars.length?s.chars[s.pos]:"";
+  if((profile.settings||{}).showFingers){
+    if(!cur) $("finger-hint").textContent="Fertig!";
+    else {
+      var f=T.FINGERS[T.fingerFor(cur, (profile.settings||{}).layout||"qwertz")];
+      var sh=T.needsShift(cur)? " + Umschalttaste":"";
+      $("finger-hint").textContent= cur===" "?"Leertaste · Daumen":("Nächste Taste „"+cur+"“ · "+(f?f.name:"") + sh);
+    }
+  }
+  highlightKeys();
+}
+
+function kbdHtml(layout, id){
+  layout=layout||"qwertz";
+  var rows=T.LAYOUTS[layout]||T.LAYOUTS.qwertz;
+  var h="";
+  rows.forEach(function(row,ri){
+    h+="<div class='kbd-row'>";
+    if(ri===2) h+="<div class='k' data-key='Shift' style='flex:.8'>⇧</div>";
+    row.forEach(function(k){
+      var fid=T.fingerFor(k, layout);
+      h+="<div class='k' data-key='"+esc(k)+"' style='box-shadow:inset 0 -3px 0 var(--finger-"+fid+")'>"+esc(k)+"</div>";
+    });
+    if(ri===2) h+="<div class='k' data-key='Enter' style='flex:.8'>⏎</div>";
+    h+="</div>";
+  });
+  h+="<div class='kbd-row'><div class='k' data-key='Shift' style='flex:1.2'>⇧</div><div class='k spacebar' data-key=' '>Leertaste</div><div class='k' data-key='Shift' style='flex:1.2'>⇧</div></div>";
+  return h;
+}
+function renderKbd(force){
+  if(force || !$("kbd").dataset.layout){
+    var lay=(profile.settings||{}).layout||"qwertz";
+    $("kbd").innerHTML=kbdHtml(lay);
+    $("kbd").dataset.layout=lay;
+  }
+  highlightKeys();
+}
+function highlightKeys(){
+  var s=S.session; if(!s) return;
+  var cur=s.pos<s.chars.length?s.chars[s.pos]:"";
+  var lay=(profile.settings||{}).layout||"qwertz";
+  var need=cur && T.needsShift(cur);
+  var look=cur?cur.toLowerCase():"";
+  var nodes=$("kbd").querySelectorAll(".k");
+  for(var i=0;i<nodes.length;i++){
+    var k=nodes[i].getAttribute("data-key");
+    var on=(k===cur || k===look);
+    if(k==="Shift") on=!!need;
+    if(k===" " && cur===" ") on=true;
+    nodes[i].classList.toggle("on", on);
+    nodes[i].classList.toggle("shift-on", k==="Shift"&&need);
+  }
+}
+
+function fmtTime(ms){
+  var s=Math.max(0,Math.round((ms||0)/1000)), m=Math.floor(s/60); s=s%60;
+  return m+":"+(s<10?"0":"")+s;
+}
+function updateLive(){
+  if(!S.session) return;
+  var now=performance.now();
+  var r=T.sessionResult(S.session, now, (profile.settings||{}).level);
+  $("lv-cpm").textContent=T.round0(r.cpm);
+  $("lv-wpm").textContent=T.round1(r.wpm);
+  $("lv-acc").textContent=T.round1(r.acc)+" %";
+  $("lv-err").textContent=r.errors;
+  var left=r.elapsedMs;
+  if(S.timerLimit) left=Math.max(0, S.timerLimit-r.elapsedMs);
+  $("lv-t").textContent=fmtTime(left);
+  if(S.timerLimit && S.session.startedAt && !S.session.pausedAt && r.elapsedMs>=S.timerLimit) finishPractice();
+}
+function startTick(){ stopTick(); S.tick=setInterval(updateLive, 250); }
+function stopTick(){ if(S.tick){ clearInterval(S.tick); S.tick=null; } }
+
+function audioCtx(){
+  if(S.audio===false) return null;
+  if(S.audio) return S.audio;
+  try{ S.audio=new (window.AudioContext||window.webkitAudioContext)(); }
+  catch(e){ S.audio=false; return null; }
+  return S.audio;
+}
+function beep(ok){
+  if(!(profile.settings||{}).sound) return;
+  var ctx=audioCtx(); if(!ctx) return;
+  try{
+    if(ctx.resume) ctx.resume().catch(function(){});
+    var o=ctx.createOscillator(), g=ctx.createGain();
+    o.type=ok?"sine":"square";
+    o.frequency.value=ok?880:180;
+    g.gain.value=0.04;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.07);
+    o.stop(ctx.currentTime+0.08);
+  }catch(e){}
+}
+function startMetro(bpm){
+  stopMetro();
+  var iv=60000/(bpm||60);
+  S.metro=setInterval(function(){
+    if(!(profile.settings||{}).sound) return;
+    var ctx=audioCtx(); if(!ctx) return;
+    try{
+      var o=ctx.createOscillator(), g=ctx.createGain();
+      o.frequency.value=660; g.gain.value=0.03;
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); o.stop(ctx.currentTime+0.04);
+    }catch(e){}
+  }, iv);
+}
+function stopMetro(){ if(S.metro){ clearInterval(S.metro); S.metro=null; } }
+
+function feed(ch){
+  var s=S.session; if(!s||s.done||s.pausedAt) return;
+  var before=s.errors;
+  T.handleInput(s, ch, performance.now());
+  if(s.strokes && s.lastGot!==undefined){
+    if(ch==="Backspace"||ch==="\b"){ /* no beep */ }
+    else beep(s.lastOk);
+  }
+  renderPrompt(); updateLive();
+  if(s.done) finishPractice();
+}
+
+function onKey(e){
+  if(!$("s-practice").classList.contains("on")) return;
+  if(e.key==="Escape"||e.key==="Tab"){ e.preventDefault(); pausePractice(); return; }
+  if(e.isComposing || e.key==="Dead") return;
+  if(e.key==="Backspace"){ e.preventDefault(); feed("Backspace"); return; }
+  if(e.key && e.key.length===1 && !e.ctrlKey && !e.metaKey){
+    e.preventDefault();
+    feed(e.key);
+  }
+}
+document.addEventListener("keydown", onKey);
+$("ghost").addEventListener("beforeinput", function(e){
+  if(!$("s-practice").classList.contains("on")) return;
+  if(e.isComposing) return;
+  if(e.inputType==="insertText" && e.data){ e.preventDefault(); feed(e.data); this.value=""; }
+  else if(e.inputType==="deleteContentBackward"){ e.preventDefault(); feed("Backspace"); this.value=""; }
+});
+$("ghost").addEventListener("input", function(){ this.value=""; });
+
+function pausePractice(){
+  if(!S.session||S.session.done) return;
+  T.pauseSession(S.session, performance.now());
+  stopTick(); stopMetro();
+  dialog("Pause. Was möchtest du tun?",[
+    {label:"Weiter tippen", fn:function(){ T.resumeSession(S.session, performance.now()); startTick(); if((profile.settings||{}).metronome) startMetro((profile.settings||{}).metronomeBpm); focusGhost(); }},
+    {label:"Neu starten", fn:function(){ if(S.lastOpts) startPractice(S.lastOpts); }},
+    {label:"Abbrechen", kind:"ghost", fn:function(){ stopTick(); stopMetro(); S.session=null; renderHome(); show("s-home"); }}
+  ]);
+}
+$("b-pause").onclick=pausePractice;
+$("b-abort").onclick=pausePractice;
+$("b-restart").onclick=function(){ if(S.lastOpts) startPractice(S.lastOpts); };
+
+function finishPractice(){
+  var s=S.session; if(!s) return;
+  stopTick(); stopMetro();
+  var now=performance.now();
+  if(s.pausedAt) T.resumeSession(s, now);
+  var res=T.sessionResult(s, now, (profile.settings||{}).level);
+  res.date=T.todayKey();
+  var prevBest=null;
+  if(S.lastOpts && S.lastOpts.lesson){
+    var old=(profile.progress||{})[S.lastOpts.lesson.id];
+    if(old&&old.best) prevBest=old.best;
+    profile.progress=T.applyLessonResult(profile.progress, S.lastOpts.lesson, res);
+  }
+  profile.stats=T.mergeKeyStats(profile.stats, res);
+  profile.history=T.appendHistory(profile.history, {
+    date:res.date, mode:(S.lastOpts&&S.lastOpts.mode)||"practice",
+    lessonId:S.lastOpts&&S.lastOpts.lesson&&S.lastOpts.lesson.id,
+    title:S.lastOpts&&S.lastOpts.title, cpm:res.cpm, wpm:res.wpm, acc:res.acc,
+    errors:res.errors, elapsedMs:res.elapsedMs, stars:res.stars
+  });
+  profile.streak=T.updateStreak(profile.streak, res.date);
+  profile.daily=T.addDailyMinutes(profile.daily, res.date, res.elapsedMs/60000, (profile.settings||{}).dailyGoalMin);
+  var before=Object.assign({}, profile.badges||{});
+  profile.badges=T.evalBadges(profile, S.lastOpts&&S.lastOpts.eventKind, res);
+  var fresh=[];
+  Object.keys(profile.badges).forEach(function(id){ if(!before[id]) fresh.push(id); });
+  S.lastNewBadges=fresh;
+  S.lastRes=res; S.lastPrevBest=prevBest;
+  saveStore();
+  renderResult(res, prevBest, fresh);
+  show("s-result");
+}
+
+function renderResult(res, prev, fresh){
+  var stars=res.stars||0;
+  $("r-h").textContent=stars>=3?"Glänzend!":stars>=2?"Super!":stars>=1?"Geschafft!":"Weiter üben";
+  $("r-stars").textContent="★★★".slice(0,stars)+"☆☆☆".slice(stars);
+  $("r-praise").textContent=T.praiseFor(stars, res.acc, profile.name);
+  $("r-cpm").textContent=T.round0(res.cpm);
+  $("r-wpm").textContent=T.round1(res.wpm);
+  $("r-acc").textContent=T.round1(res.acc)+" %";
+  $("r-err").textContent=res.errors;
+  $("r-t").textContent=fmtTime(res.elapsedMs);
+  var cmp="";
+  if(prev){
+    var dc=res.cpm-(prev.cpm||0), da=res.acc-(prev.acc||0);
+    cmp= (dc>=0?"▲ +":"▼ ")+T.round0(dc)+" A/min gegenüber deinem Bestwert";
+    cmp+=" · Genauigkeit "+(da>=0?"+":"")+T.round1(da)+" %";
+  } else cmp="Das war deine erste Bewertung in dieser Übung.";
+  $("r-cmp").textContent=cmp;
+  var nb="";
+  (fresh||[]).forEach(function(id){
+    var b=T.BADGES.filter(function(x){return x.id===id;})[0];
+    if(b) nb+="<span class='badge'>🏆 Neu: "+esc(b.title)+"</span>";
+  });
+  $("r-newbadge").innerHTML=nb;
+}
+$("b-again").onclick=function(){ if(S.lastOpts) startPractice(S.lastOpts); };
+$("b-res-home").onclick=function(){ renderHome(); show("s-home"); };
+$("b-cert").onclick=function(){ drawCert(); show("s-cert"); };
+$("b-back-c").onclick=function(){ show("s-result"); };
+
+function drawCert(){
+  var c=$("certc"), ctx=c.getContext("2d"), res=S.lastRes||{acc:0,cpm:0,wpm:0,stars:0,date:T.todayKey()};
+  var W=c.width, H=c.height;
+  ctx.fillStyle="#f7f1e3"; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#0f7a6e"; ctx.lineWidth=18; ctx.strokeRect(36,36,W-72,H-72);
+  ctx.strokeStyle="#d9a21b"; ctx.lineWidth=4; ctx.strokeRect(56,56,W-112,H-112);
+  ctx.fillStyle="#0f7a6e"; ctx.font="bold 64px Georgia, serif"; ctx.textAlign="center";
+  ctx.fillText("Tipp-Trainer", W/2, 160);
+  ctx.fillStyle="#17202a"; ctx.font="italic 36px Georgia, serif";
+  ctx.fillText("Urkunde für fleißiges 10-Finger-Schreiben", W/2, 220);
+  ctx.font="bold 56px Georgia, serif";
+  ctx.fillText(profile.name, W/2, 330);
+  ctx.font="32px Georgia, serif";
+  var title=(S.lastOpts&&S.lastOpts.title)||"Übung";
+  ctx.fillText("hat die Übung „"+title+"“ abgeschlossen.", W/2, 400);
+  ctx.font="bold 36px Georgia, serif";
+  ctx.fillText(T.round0(res.cpm)+" Anschläge/min   ·   "+T.round1(res.wpm)+" Wörter/min   ·   "+T.round1(res.acc)+" % genau", W/2, 490);
+  ctx.font="48px serif";
+  ctx.fillText("★★★".slice(0,res.stars||0)+"☆☆☆".slice(res.stars||0), W/2, 560);
+  ctx.font="24px Georgia, serif"; ctx.fillStyle="#5b6b76";
+  ctx.fillText("Datum: "+(res.date||"")+"  ·  Nur zur Anzeige, offline erstellt", W/2, 680);
+}
+$("b-dl-cert").onclick=function(){
+  try{
+    var c=$("certc");
+    c.toBlob(function(blob){
+      if(!blob) return;
+      var a=document.createElement("a");
+      a.href=URL.createObjectURL(blob);
+      a.download="tipp-trainer-urkunde.png";
+      a.click();
+    });
+  }catch(e){ dialog("Die Urkunde konnte nicht gespeichert werden.",[{label:"OK"}]); }
+};
+
+function renderStats(){
+  drawChart();
+  var lay=(profile.settings||{}).layout||"qwertz";
+  $("heat").innerHTML=kbdHtml(lay);
+  paintHeat();
+  $("heat").onclick=function(e){
+    var k=e.target.closest(".k"); if(!k)return;
+    var ch=k.getAttribute("data-key"); if(!ch||ch==="Shift"||ch==="Enter")return;
+    var rec=(profile.stats.keys||{})[ch]||(profile.stats.keys||{})[ch.toLowerCase()];
+    if(!rec){ $("heat-info").textContent="Noch keine Daten für „"+ch+"“."; return; }
+    $("heat-info").textContent="Taste „"+ch+"“: "+(rec.hits||0)+" richtig, "+(rec.errors||0)+" Fehler, "+T.round0(T.keyErrorRate(rec)*100)+"% Fehlerquote, Ø "+T.round0(T.keyAvgMs(rec))+" ms.";
+  };
+  var probs=T.rankedProblemKeys(profile.stats, 10);
+  if(!probs.length) $("prob-keys").innerHTML="<p class='hint'>Noch zu wenig Daten – nach ein paar Übungen erscheinen hier deine typischen Fehler.</p>";
+  else $("prob-keys").innerHTML="<ul>"+probs.map(function(p){ return "<li><b>"+esc(p.key===" "?"Leertaste":p.key)+"</b> · "+p.errors+" Fehler, "+T.round0(p.rate*100)+" %</li>"; }).join("")+"</ul>";
+  show("s-stats");
+}
+function paintHeat(){
+  var nodes=$("heat").querySelectorAll(".k");
+  for(var i=0;i<nodes.length;i++){
+    var ch=nodes[i].getAttribute("data-key");
+    var rec=(profile.stats.keys||{})[ch]||{};
+    var rate=T.keyErrorRate(rec);
+    var a=Math.min(0.75, rate*2);
+    nodes[i].style.background= a?("rgba(201,75,58,"+a+")"):"";
+  }
+}
+function drawChart(){
+  var svg=$("chart"), hist=(profile.history||[]).slice(-24);
+  svg.innerHTML="";
+  function nd(n,a){ var e=document.createElementNS("http://www.w3.org/2000/svg",n); for(var k in a) e.setAttribute(k,a[k]); svg.appendChild(e); return e; }
+  nd("rect",{x:0,y:0,width:320,height:140,fill:"transparent"});
+  if(hist.length<2){ nd("text",{x:160,y:76,"text-anchor":"middle",fill:"currentColor","font-size":12}).textContent="Nach zwei Übungen siehst du hier den Verlauf."; return; }
+  function path(vals, max, color){
+    var d="",i,x,y;
+    for(i=0;i<vals.length;i++){
+      x=20+(i/(vals.length-1))*280;
+      y=120-(Math.max(0,vals[i])/max)*100;
+      d+=(i?"L":"M")+x.toFixed(1)+","+y.toFixed(1);
+    }
+    nd("path",{d:d,fill:"none",stroke:color,"stroke-width":2.5,"stroke-linejoin":"round","stroke-linecap":"round"});
+  }
+  var cpms=hist.map(function(h){return h.cpm||0;});
+  var wpms=hist.map(function(h){return (h.wpm||0)*5;}); /* scale to cpm axis */
+  var accs=hist.map(function(h){return h.acc||0;});
+  var max=Math.max(80, Math.max.apply(null, cpms.concat(wpms)));
+  path(cpms,max,"#0f7a6e");
+  path(wpms,max,"#d9a21b");
+  path(accs,100,"#1d6fd1");
+}
+$("b-back-s").onclick=function(){ renderHome(); show("s-home"); };
+$("b-export").onclick=function(){
+  try{
+    var blob=new Blob([T.exportState(store)],{type:"application/json"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+    a.download="tipp-trainer-fortschritt.json"; a.click();
+  }catch(e){ dialog("Export hat nicht geklappt.",[{label:"OK"}]); }
+};
+$("b-import").onclick=function(){ $("import-file").click(); };
+$("import-file").onchange=function(){
+  var f=this.files&&this.files[0]; this.value="";
+  if(!f) return;
+  var r=new FileReader();
+  r.onload=function(){
+    var out=T.importState(String(r.result), store);
+    if(!out.ok){ dialog(out.error,[{label:"OK"}]); return; }
+    dialog("Import ersetzen? Deine bisherigen lokalen Daten werden überschrieben.",[
+      {label:"Ja, übernehmen", fn:function(){ store=out.store; saveStore(); useProfile(store.current); renderStats(); }},
+      {label:"Abbrechen", kind:"ghost"}
+    ]);
+  };
+  r.readAsText(f);
+};
+
+function renderSettings(){
+  var st=profile.settings||T.DEFAULT_SETTINGS;
+  function row(id,label,type,opts){
+    if(type==="check") return "<label class='switch'>"+label+"<input type='checkbox' data-k='"+id+"' "+(st[id]?"checked":"")+"></label>";
+    if(type==="select"){
+      var o=(opts||[]).map(function(x){ return "<option value='"+x[0]+"'"+(st[id]===x[0]?" selected":"")+">"+x[1]+"</option>"; }).join("");
+      return "<label class='lab'>"+label+"</label><select data-k='"+id+"'>"+o+"</select>";
+    }
+    return "<label class='lab'>"+label+"</label><input data-k='"+id+"' type='number' value='"+(st[id]||"")+"'>";
+  }
+  $("set-list").innerHTML=
+    row("keyboardHelp","Bildschirmtastatur anzeigen","check")+
+    row("showFingers","Fingerhaltung anzeigen","check")+
+    row("blind","Blind schreiben (Tastaturhilfe aus)","check")+
+    row("sound","Töne","check")+
+    row("metronome","Metronom","check")+
+    row("mustCorrect","Fehler zuerst mit Rücktaste korrigieren","check")+
+    row("allUnlocked","Alle Lektionen freischalten","check")+
+    row("colorblind","Farbenblind-freundliche Palette","check")+
+    row("largeType","Große Schrift","check")+
+    row("reduceMotion","Bewegung reduzieren","check")+
+    row("theme","Erscheinungsbild","select",[["auto","Automatisch"],["light","Hell"],["dark","Dunkel"]])+
+    row("layout","Tastaturbelegung","select",[["qwertz","QWERTZ (Deutsch)"],["qwerty","QWERTY"]])+
+    row("level","Tempo-Stufe","select",[["kind","Kind"],["jugend","Jugend"],["erwachsen","Erwachsene"]])+
+    row("unlockAcc","Freischaltung ab Genauigkeit %","number")+
+    row("dailyGoalMin","Tagesziel in Minuten","number")+
+    row("fontSize","Schriftgröße (px)","number")+
+    row("metronomeBpm","Metronom (Schläge/min)","number");
+  $("set-name").value=profile.name;
+  $("set-list").onchange=function(e){
+    var el=e.target, k=el.getAttribute("data-k"); if(!k)return;
+    if(el.type==="checkbox") profile.settings[k]=el.checked;
+    else if(el.type==="number") profile.settings[k]=+el.value;
+    else profile.settings[k]=el.value;
+    if(k==="blind" && profile.settings.blind) profile.settings.keyboardHelp=false;
+    saveStore(); applyAppearance();
+  };
+  show("s-settings");
+}
+$("b-back-e").onclick=function(){ renderHome(); show("s-home"); };
+$("b-ren").onclick=function(){
+  var n=($("set-name").value||"").trim(); if(!n)return;
+  profile.name=n; saveStore(); dialog("Name gespeichert.",[{label:"OK"}]);
+};
+$("b-newprof").onclick=function(){
+  dialog("Wie heißt das neue Profil?",[{label:"OK",fn:function(){ /* fallback */ }}]);
+  var inp=document.createElement("input"); inp.type="text"; inp.maxLength=24; inp.placeholder="Name";
+  inp.style.cssText="margin:8px 0;width:100%";
+  $("dlg-t").textContent="Neues Profil";
+  $("dlg-a").innerHTML=""; $("dlg-a").appendChild(inp);
+  var ok=document.createElement("button"); ok.className="btn"; ok.textContent="Anlegen";
+  ok.onclick=function(){ $("dlg").classList.remove("on"); createAndUse(inp.value); };
+  var no=document.createElement("button"); no.className="btn ghost"; no.textContent="Abbrechen";
+  no.onclick=function(){ $("dlg").classList.remove("on"); };
+  $("dlg-a").appendChild(ok); $("dlg-a").appendChild(no);
+  $("dlg").classList.add("on"); setTimeout(function(){inp.focus();},50);
+};
+$("b-wipe").onclick=function(){
+  dialog("Welche Daten sollen gelöscht werden? Das lässt sich nicht rückgängig machen.",[
+    {label:"Nur dieses Profil", kind:"warn", fn:function(){ delete store.profiles[pid]; var ids=Object.keys(store.profiles); if(!ids.length){ store.current=null; saveStore(); show("s-onboard"); } else { useProfile(ids[0]); renderHome(); show("s-home"); } }},
+    {label:"Alle Profile", kind:"warn", fn:function(){ store={current:null,profiles:{}}; saveStore(); show("s-onboard"); }},
+    {label:"Abbrechen", kind:"ghost"}
+  ]);
+};
+
+/* Wortregen */
+function startGame(){
+  stopGame();
+  S.game={ score:0, missed:0, items:[], t:null, running:true, words:D.GAME_WORDS.de.slice() };
+  $("g-score").textContent="0";
+  $("g-stage").innerHTML="";
+  $("g-in").value="";
+  show("s-game");
+  $("g-in").focus();
+  var reduce=(profile.settings||{}).reduceMotion;
+  function spawn(){
+    if(!S.game||!S.game.running) return;
+    var w=S.game.words[Math.floor(Math.random()*S.game.words.length)];
+    var el=document.createElement("div");
+    el.textContent=w;
+    el.style.cssText="position:absolute;top:0;left:"+Math.floor(Math.random()*70+5)+"%;font-weight:800;font-size:22px;padding:6px 10px;background:var(--card);border-radius:12px;border:2px solid var(--line)";
+    $("g-stage").appendChild(el);
+    var item={el:el,word:w,y:0,speed: reduce?0: (0.25+Math.random()*0.35)};
+    if(reduce){ item.y=20+S.game.items.length*36; el.style.top=item.y+"px"; }
+    S.game.items.push(item);
+  }
+  spawn(); spawn();
+  S.game.t=setInterval(function(){
+    if(!S.game||!S.game.running) return;
+    var h=$("g-stage").clientHeight;
+    if(S.game.items.length<5 && Math.random()<0.25) spawn();
+    if((profile.settings||{}).reduceMotion) return;
+    S.game.items.forEach(function(it){
+      it.y+=it.speed*16;
+      it.el.style.top=it.y+"px";
+      if(it.y>h-40 && !it.gone){ it.gone=true; it.el.style.opacity=".3"; S.game.missed++; }
+    });
+    S.game.items=S.game.items.filter(function(it){ if(it.gone && it.y>h){ it.el.remove(); return false;} return true; });
+    if(S.game.missed>=8){ endGame(); }
+  }, 50);
+}
+function endGame(){
+  if(!S.game) return;
+  S.game.running=false; clearInterval(S.game.t);
+  dialog("Wortregen zu Ende! Punkte: "+S.game.score+" · vorbei: "+S.game.missed, [
+    {label:"Noch einmal", fn:startGame},
+    {label:"Zur Übersicht", kind:"ghost", fn:function(){ stopGame(); renderHome(); show("s-home"); }}
+  ]);
+}
+function stopGame(){ if(S.game&&S.game.t) clearInterval(S.game.t); S.game=null; $("g-stage").innerHTML=""; }
+$("b-game-quit").onclick=function(){ stopGame(); renderHome(); show("s-home"); };
+$("g-in").addEventListener("keydown", function(e){
+  if(e.key===" "||e.key==="Enter"){
+    e.preventDefault();
+    if(!S.game) return;
+    var v=T.nfc(this.value.trim().toLowerCase());
+    this.value="";
+    var hit=S.game.items.find(function(it){ return !it.gone && T.nfc(it.word.toLowerCase())===v; });
+    if(hit){ hit.gone=true; hit.el.remove(); S.game.items=S.game.items.filter(function(x){return x!==hit;}); S.game.score++; $("g-score").textContent=S.game.score; }
+  }
+});
+
+window.addEventListener("error", function(e){
+  var m=(e&&e.message)||"";
+  if(!m||/^Script error\.?$/i.test(m)) return;
+  if(e.filename && location.protocol!=="file:" && e.filename.indexOf(location.origin)!==0) return;
+  var b=$("err"); if(!b) return;
+  b.style.display="block";
+  b.textContent="Hoppla, da ist etwas schiefgelaufen. Lade die Seite neu, falls etwas nicht klappt.";
+  setTimeout(function(){ b.style.display="none"; }, 5000);
+});
+
+window.__tipp={ get S(){return S;}, get profile(){return profile;}, get store(){return store;}, startPractice:startPractice, T:T, D:D };
+
+boot();
+
+if("serviceWorker" in navigator && location.protocol!=="file:"){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      function hint(){ $("update").style.display="block"; }
+      if(reg.waiting) hint();
+      reg.addEventListener("updatefound", function(){
+        var nw=reg.installing; if(!nw) return;
+        nw.addEventListener("statechange", function(){ if(nw.state==="installed"&&navigator.serviceWorker.controller) hint(); });
+      });
+      $("b-upd").onclick=function(){ if(reg.waiting) reg.waiting.postMessage({type:"SKIP_WAITING"}); location.reload(); };
+      var refreshing=false;
+      navigator.serviceWorker.addEventListener("controllerchange", function(){ if(refreshing) return; refreshing=true; });
+    }).catch(function(){});
+  });
+}
+})();
+</script>
+</body>
+</html>

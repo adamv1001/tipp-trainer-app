@@ -1,0 +1,17 @@
+{
+  "name": "Tipp-Trainer – 10-Finger-Schreiben",
+  "short_name": "Tipp-Trainer",
+  "description": "Offline 10-Finger-Schreibtrainer auf Deutsch für iPad, iPhone und Computer",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f0e8",
+  "theme_color": "#0f7a6e",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
